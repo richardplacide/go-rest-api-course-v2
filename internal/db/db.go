@@ -2,11 +2,9 @@ package db
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	"github.com/jmoiron/sqlx"
-	_ "github.com/lib/pq"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Database struct {
@@ -14,24 +12,12 @@ type Database struct {
 }
 
 func NewDatabase() (*Database, error) {
-	connectionString := fmt.Sprintf(
-		"host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASSWORD"),
-		os.Getenv("DB_NAME"),
-		os.Getenv("DB_SSL_MODE"),
-	)
-
-	dbConn, err := sqlx.Connect("postgres", connectionString)
-
+	//db, err := sqlx.Open("sqlite3", ":memory:")
+	db, err := sqlx.Connect("sqlite3", "./db.sqlite")
 	if err != nil {
-		return &Database{}, fmt.Errorf("could not connect to the database")
+		return nil, err
 	}
-
-	return &Database{Client: dbConn}, nil
-
+	return &Database{Client: db}, nil
 }
 
 // health check Ping the database
